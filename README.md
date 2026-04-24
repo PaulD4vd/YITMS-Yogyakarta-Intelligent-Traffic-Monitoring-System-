@@ -21,7 +21,7 @@ menggunakan public CCTV Kota Yogyakarta · YOLO Tracking · MQTT · Streamlit
 
 > Preview sistem inferensi berjalan secara real-time pada stream CCTV publik Kota Yogyakarta.
 
-https://github.com/PaulD4vd/YITMS-Yogyakarta-Intelligent-Traffic-Monitoring-System-/raw/main/asset/preview.mp4
+https://github.com/PaulD4vd/YITMS-Yogyakarta-Intelligent-Traffic-Monitoring-System-/raw/main/asset/preview.gif
 
 ---
 
