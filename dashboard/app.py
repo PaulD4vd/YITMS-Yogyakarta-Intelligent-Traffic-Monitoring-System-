@@ -195,7 +195,7 @@ def load_data():
     import pathlib
     base = pathlib.Path(__file__).parent.parent  # root of repo
     # Try full dataset first, fall back to sample data for demo/CI
-    for candidate in ["data_cctv_clean_v1.csv", "data/data_cctv_clean_v1.csv", "data/sample_data.csv"]:
+    for candidate in ["data_cctv_clean_v1.csv", "data/data_bersih.csv", "data/sample_data.csv"]:
         path = base / candidate
         if path.exists():
             df = pd.read_csv(path)
