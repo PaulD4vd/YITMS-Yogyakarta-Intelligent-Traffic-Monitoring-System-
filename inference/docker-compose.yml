@@ -1,0 +1,76 @@
+version: "3.9"
+
+# ─── YAML Anchor: konfigurasi TANPA deploy (GPU dideklarasikan per-service) ──
+# deploy.resources tidak dimasukkan ke anchor karena merge-nya tidak reliable
+# di semua versi Docker Compose
+
+x-common: &common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  volumes:
+    - ../yolo26n.pt:/app/model/yolo26n.pt:ro
+    - ../custom_bytetrack.yaml:/app/model/custom_bytetrack.yaml:ro
+  restart: unless-stopped
+  network_mode: host
+  environment:
+    - PYTHONUNBUFFERED=1
+    - MODEL_PATH=/app/model/yolo26n.pt
+    - TRACKER_PATH=/app/model/custom_bytetrack.yaml
+    - NVIDIA_VISIBLE_DEVICES=all # env var sebagai fallback
+    - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+# ─── GPU anchor terpisah agar mudah di-reuse ─────────────────────────────────
+x-gpu: &gpu
+  runtime: nvidia # ← eksplisit pakai nvidia runtime sebagai pengaman
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: 1 # 1 GPU per container; ubah jika multi-GPU
+            capabilities: [ gpu ] # ← HARUS "gpu", bukan "all"
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  cam1-demangan:
+    <<: [ *common, *gpu ] # merge dua anchor sekaligus
+    container_name: cam1-demangan
+    command: python -u /app/infrensi/cam1-demangan.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  cam2-pingit:
+    <<: [ *common, *gpu ]
+    container_name: cam2-lampumerah-pingit
+    command: python -u /app/infrensi/cam2-lampumerah-pingit.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  cam3-yos-sudarso:
+    <<: [ *common, *gpu ]
+    container_name: cam3-yos-sudarso
+    command: python -u /app/infrensi/cam3-yos-sudarso.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  cam4-titiknol:
+    <<: [ *common, *gpu ]
+    container_name: cam4-titiknol
+    command: python -u /app/infrensi/cam4-titiknol.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

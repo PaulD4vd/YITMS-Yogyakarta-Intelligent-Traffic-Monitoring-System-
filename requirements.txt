@@ -1,0 +1,11 @@
+# ─── Dashboard (Streamlit) ────────────────────────────────────────────────────
+streamlit>=1.30.0
+plotly>=5.18.0
+pandas>=2.0.0
+pytz>=2024.1
+kaleido>=0.2.1       # For static chart export
+
+# ─── Inference (also see inference/requirements.txt for Docker) ───────────────
+# ultralytics>=8.0.0
+# opencv-python-headless>=4.8.0
+# paho-mqtt>=1.6.0
