@@ -247,5 +247,5 @@ python inference/cam1-demangan.py
 ---
 
 <div align="center">
-Made with ❤️ for the open-source community · Yogyakarta, Indonesia 🇮🇩
+pauldaviddjukardi@gmail.com
 </div>
