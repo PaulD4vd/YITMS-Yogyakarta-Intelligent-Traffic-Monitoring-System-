@@ -23,9 +23,11 @@ menggunakan public CCTV Kota Yogyakarta · YOLO Tracking · MQTT · Streamlit
 
 ![Preview](https://github.com/PaulD4vd/YITMS-Yogyakarta-Intelligent-Traffic-Monitoring-System-/blob/main/asset/preview.gif)
 
-> Dashboard
-![Preview](https://yogyakarta-intelligent-traffic-monitoring-system.streamlit.app)
 ---
+
+## Dashboard
+
+[Open Live Dashboard](https://yogyakarta-intelligent-traffic-monitoring-system.streamlit.app)
 
 ## 📖 Tentang Project
 
