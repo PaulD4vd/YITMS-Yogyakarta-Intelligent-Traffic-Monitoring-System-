@@ -3,89 +3,94 @@
 <div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
-![YOLOv8](https://img.shields.io/badge/YOLO-v8%2Fv26-purple?logo=ultralytics)
+![YOLOv8](https://img.shields.io/badge/YOLO-v8%2Fv26-purple)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-red?logo=streamlit)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-Paho-660066?logo=eclipsemosquitto)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Open Source](https://img.shields.io/badge/Open%20Source-❤️-orange)
+![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-orange)
 
 **Sistem monitoring dan analitik lalu lintas real-time berbasis Computer Vision**  
-menggunakan public CCTV Kota Yogyakarta, YOLO tracking, MQTT, dan Streamlit Dashboard.
-
-[Demo Dashboard](#-analytics-dashboard) · [Arsitektur Sistem](#-arsitektur-sistem) · [Cara Setup](#-cara-setup) · [Kontribusi](#-kontribusi)
+menggunakan public CCTV Kota Yogyakarta · YOLO Tracking · MQTT · Streamlit
 
 </div>
 
 ---
 
+## 🎬 Demo Prototype
+
+> Preview sistem inferensi berjalan secara real-time pada stream CCTV publik Kota Yogyakarta.
+
+https://github.com/PaulD4vd/YITMS-Yogyakarta-Intelligent-Traffic-Monitoring-System-/raw/main/asset/preview.mp4
+
+---
+
 ## 📖 Tentang Project
 
-YITMS adalah sistem open-source yang memadukan **Computer Vision** dan **Data Analytics** untuk memantau kepadatan lalu lintas secara real-time di beberapa titik strategis Kota Yogyakarta. Project ini dirancang sebagai referensi pembelajaran untuk siapa saja yang ingin memahami implementasi CV inference pipeline end-to-end.
+YITMS adalah sistem open-source yang memadukan **Computer Vision** dan **Data Analytics** untuk memantau kepadatan lalu lintas secara real-time di titik-titik strategis Kota Yogyakarta. Data deteksi dikirim via MQTT dan divisualisasikan melalui dashboard interaktif berbasis Streamlit.
+
+Project ini dirancang sebagai **referensi open-source** yang bisa dipelajari, dikembangkan, dan dikontribusikan oleh siapapun.
 
 ### Fitur Utama
 
 | Fitur | Detail |
 |-------|--------|
 | 🎯 **Real-time Detection** | YOLO tracking pada stream HLS public CCTV Jogjakota |
-| 🚗 **Multi-class** | Deteksi Motor, Mobil, Bus/Truk, dan Sepeda |
-| 📡 **MQTT Publishing** | Data dikirim ke broker secara real-time |
-| 🐳 **Dockerized** | Semua inference container siap deploy |
-| 📊 **Dashboard Analytics** | Visualisasi interaktif dengan Streamlit + Plotly |
+| 🚗 **Multi-class** | Motor, Mobil, Bus/Truk, dan Sepeda |
+| 📡 **MQTT Publishing** | Payload JSON dikirim ke broker setiap kendaraan baru terdeteksi |
+| 🐳 **Dockerized** | 4 inference container siap deploy secara bersamaan |
+| 📊 **Analytics Dashboard** | Visualisasi interaktif filter by tanggal, jam, lokasi |
 | 🔄 **Auto-reconnect** | Stream HLS reconnect otomatis saat putus |
-
-### Lokasi CCTV yang Dipantau
-
-| Camera | Lokasi | MQTT Topic |
-|--------|--------|------------|
-| `cam1` | Simpang Demangan | `/demangan/hasil_deteksi` |
-| `cam2` | Lampu Merah Pingit | `/lampu_merah_pingit3/hasil_deteksi` |
-| `cam3` | Jl. Yos Sudarso | `/yos_sudarso/hasil_deteksi` |
-| `cam4` | Titik Nol KM | `/titik_nol/hasil_deteksi` |
 
 ---
 
-## 🏗 Arsitektur Sistem
+## 🛣️ Lokasi Pengamatan
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     PUBLIC CCTV STREAMS                     │
-│          cctvjss.jogjakota.go.id  (HLS / m3u8)             │
-└──────────────┬──────────────────────────────────────────────┘
-               │ 4x RTSP/HLS Streams
-               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  INFERENCE ENGINE (Docker)                   │
-│                                                             │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
-│  │  cam1    │ │  cam2    │ │  cam3    │ │  cam4    │      │
-│  │ demangan │ │  pingit  │ │  yos-sud │ │ titiknol │      │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘      │
-│       │            │            │             │             │
-│       └────────────┴────┬───────┴─────────────┘            │
-│                   YOLO Tracking                             │
-│              (ByteTrack + NMS Filter)                       │
-└───────────────────────┬─────────────────────────────────────┘
-                        │ JSON Payload via MQTT
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    MQTT BROKER (Mosquitto)                   │
-│                  192.168.1.99 : 1883                        │
-└───────────────────────┬─────────────────────────────────────┘
-                        │ Subscribe & Store
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   DATA STORAGE (CSV / DB)                   │
-│           data/data_cctv_clean_v1.csv  (181K rows)         │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              ANALYTICS DASHBOARD (Streamlit)                │
-│                                                             │
-│   KPI Cards · Line Chart · Bar Chart · Donut · Heatmap     │
-│        Stacked Bar · Filter by Date, Hour, Location        │
-└─────────────────────────────────────────────────────────────┘
-```
+Sistem ini mengambil data dari **3 titik CCTV publik** di Kota Yogyakarta:
+
+### 📍 Simpang Demangan
+
+![Simpang Demangan — YOLO detection berjalan real-time](asset/demangan.png)
+
+> **cam1** · `ATCS_Simpang_Demangan_View_Timur` · MQTT topic: `/demangan/hasil_deteksi`
+
+---
+
+### 📍 Jl. Yos Sudarso
+
+![Jl. Yos Sudarso — multi-vehicle tracking](asset/yos_sudarso.png)
+
+> **cam3** · `ANPR-Jl-Yos-Sudarso` · MQTT topic: `/yos_sudarso/hasil_deteksi`
+
+---
+
+### 📍 Titik Nol Kilometer
+
+![Titik Nol KM Yogyakarta — deteksi di kawasan Malioboro](asset/titik_nol.png)
+
+> **cam4** · `NolKm_Timur` · MQTT topic: `/titik_nol/hasil_deteksi`
+
+---
+
+## 🔄 Pipeline Inferensi
+
+Berikut adalah alur lengkap dari pengambilan data CCTV hingga penyimpanan ke database:
+
+![Pipeline Inferensi YITMS — dari CCTV stream ke MQTT broker hingga database](asset/pipeline-infrensi.png)
+
+### Penjelasan Tiap Tahap
+
+| Tahap | Komponen | Keterangan |
+|-------|----------|------------|
+| **Stream** | HLS / m3u8 | Baca frame dari CCTV public Jogjakota via `cv2.VideoCapture` |
+| **Preprocessing** | `StreamReader` | Frame dibaca di background thread, resize untuk efisiensi inferensi |
+| **Postprocessing** | YOLO + ByteTrack | Deteksi objek, tracking ID, filter `MIN_TRACK_AGE` untuk eliminasi noise |
+| **Publish** | `paho-mqtt` | Payload JSON dikirim ke MQTT broker setiap ada track baru yang dikonfirmasi |
+| **Broker** | Mosquitto (opsional) | Message broker sebagai perantara antara inference dan storage |
+| **Consumer** | Ingestion service | Subscribe MQTT → parse → simpan ke database *(komponen terpisah)* |
+| **Database** | QuestDB / Timeseries | Penyimpanan data time-series deteksi *(komponen terpisah)* |
+
+> 💡 **Catatan:** Komponen *Consumer/Ingestion* dan *Database* tidak disertakan di repo ini. Di project ini, data disimpan dalam format CSV yang tersedia di folder `data/`.
 
 ---
 
@@ -99,27 +104,33 @@ yitms/
 │   ├── cam2-lampumerah-pingit.py
 │   ├── cam3-yos-sudarso.py
 │   ├── cam4-titiknol.py
-│   ├── Dockerfile              # Docker image untuk inference
-│   ├── docker-compose.yml      # Orchestrasi 4 container sekaligus
-│   ├── requirements.txt        # Dependency inference (ultralytics, paho-mqtt)
-│   ├── start.sh                # Helper: start semua container
-│   └── stop.sh                 # Helper: stop semua container
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── requirements.txt
+│   ├── start.sh
+│   └── stop.sh
 │
 ├── dashboard/
 │   └── app.py                  # Streamlit analytics dashboard
 │
 ├── notebooks/
-│   └── olahdata.ipynb          # Eksplorasi dan preprocessing data
+│   └── olahdata.ipynb          # Eksplorasi & preprocessing data
 │
 ├── data/
-│   ├── sample_data.csv         # ✅ Sample 500 baris (untuk demo)
-│   └── .gitkeep
+│   ├── data_cctv_clean_v1.csv  # Dataset bersih (181K rows)
+│   ├── data_kotor.csv          # Raw data sebelum cleaning
+│   └── sample_data.csv         # Sample 500 baris untuk demo
+│
+├── asset/                      # Media dokumentasi
+│   ├── preview.mp4
+│   ├── pipeline-infrensi.png
+│   ├── demangan.png
+│   ├── yos_sudarso.png
+│   └── titik_nol.png
 │
 ├── models/                     # Letakkan model .pt di sini (di-.gitignore)
-│   └── .gitkeep
-│
 ├── .gitignore
-├── requirements.txt            # Dependency dashboard
+├── requirements.txt
 └── README.md
 ```
 
@@ -130,110 +141,68 @@ yitms/
 ### Prasyarat
 
 - Python 3.10+
-- Docker & Docker Compose (untuk inference)
-- NVIDIA GPU opsional (CPU tetap bisa, tapi lambat)
-- MQTT Broker (Mosquitto) di jaringan lokal
+- Docker & Docker Compose
+- NVIDIA GPU opsional (CPU tetap bisa, tapi lebih lambat)
+- MQTT Broker (Mosquitto) jika ingin full pipeline
 
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/yitms.git
-cd yitms
+git clone https://github.com/PaulD4vd/YITMS-Yogyakarta-Intelligent-Traffic-Monitoring-System-.git
+cd YITMS-Yogyakarta-Intelligent-Traffic-Monitoring-System-
 ```
 
-### 2. Setup Analytics Dashboard
+### 2. Analytics Dashboard
 
 ```bash
-# Install dependency
 pip install -r requirements.txt
-
-# Letakkan file data lengkap (opsional, sample sudah tersedia)
-cp /path/to/data_cctv_clean_v1.csv data/
-
-# Jalankan dashboard
 streamlit run dashboard/app.py
 ```
 
-Dashboard akan terbuka di `http://localhost:8501`
+Dashboard terbuka di `http://localhost:8501` — dataset sudah tersedia di `data/`.
 
-### 3. Setup Inference Engine (Docker)
+### 3. Inference Engine (Docker)
 
-#### Siapkan Model & Tracker
+#### Siapkan model
 
 ```bash
-# Download atau copy model YOLO ke folder models/
+# Letakkan model YOLO dan tracker config di folder models/
 cp /path/to/yolo26n.pt models/
 cp /path/to/custom_bytetrack.yaml models/
 ```
 
-> 💡 **Model YOLO:** Project ini menggunakan model custom yang ditraining untuk kendaraan Indonesia.  
-> Kamu bisa menggunakan model YOLO standar (`yolov8n.pt`) sebagai alternatif.
+> Bisa juga pakai model standar `yolov8n.pt` dari Ultralytics sebagai alternatif.
 
-#### Konfigurasi MQTT Broker
+#### Konfigurasi MQTT
 
-Edit `inference/cam1-demangan.py` (dan file cam lainnya) sesuaikan IP broker:
+Edit IP broker di `inference/cam*.py` (atau gunakan env var):
 
 ```python
-MQTT_BROKER = "192.168.1.99"   # Ganti dengan IP MQTT broker kamu
-MQTT_PORT   = 1883
+MQTT_BROKER = "192.168.1.99"   # Ganti dengan IP broker kamu
 ```
 
-Atau gunakan environment variable:
-
-```bash
-export MQTT_BROKER=192.168.x.x
-```
-
-#### Deploy dengan Docker Compose
+#### Deploy
 
 ```bash
 cd inference/
-
-# Build & jalankan semua container
 docker compose up -d --build
-
-# Cek log real-time
 docker compose logs -f
-
-# Stop semua
-docker compose down
 ```
 
-#### Menjalankan Tanpa Docker (Local)
+#### Tanpa Docker (local)
 
 ```bash
 pip install -r inference/requirements.txt
 
-# Set env vars
 export MODEL_PATH=/path/to/models/yolo26n.pt
 export TRACKER_PATH=/path/to/models/custom_bytetrack.yaml
 
-# Jalankan satu kamera
 python inference/cam1-demangan.py
 ```
 
 ---
 
-## 📊 Analytics Dashboard
-
-Dashboard Streamlit menampilkan:
-
-| Visualisasi | Deskripsi |
-|-------------|-----------|
-| **KPI Cards** | Total volume, lokasi terpadat, kendaraan dominan, jam puncak |
-| **Line Chart** | Tren volume per jam per lokasi |
-| **Bar Chart** | Komparasi volume antar lokasi |
-| **Donut Chart** | Komposisi jenis kendaraan |
-| **Heatmap** | Intensitas trafik (lokasi × jam) |
-| **Stacked Bar** | Komposisi kendaraan per lokasi |
-
-**Filter yang tersedia:** Tanggal, rentang jam, lokasi, dan jenis kendaraan.
-
----
-
-## 📡 Format Data MQTT
-
-Setiap kali kendaraan baru terdeteksi dan dikonfirmasi (minimal terlihat `MIN_TRACK_AGE` frame), payload JSON dikirim ke broker:
+## 📡 Format Payload MQTT
 
 ```json
 {
@@ -248,62 +217,51 @@ Setiap kali kendaraan baru terdeteksi dan dikonfirmasi (minimal terlihat `MIN_TR
 
 ---
 
-## 📈 Format Dataset
-
-File CSV memiliki kolom berikut:
+## 📈 Format Dataset CSV
 
 | Kolom | Tipe | Contoh |
 |-------|------|--------|
-| `camera_id` | string | `cam1` |
+| `camera_id` | string | `cam1`, `cam3`, `cam4` |
 | `object` | string | `motor`, `mobil`, `bus_truk`, `sepeda` |
 | `track_id` | int | `12345` |
 | `detection_timestamp` | datetime (UTC) | `2026-03-25 07:23:41` |
 | `created_at` | datetime | `2026-03-25 20:14:22` |
-| `location` | string | `demangan` |
+| `location` | string | `demangan`, `yos_sudarso`, `titik_nol` |
 
 ---
 
 ## 🤝 Kontribusi
 
-Project ini sepenuhnya open-source dan menyambut kontribusi dari siapapun! 🙌
+Project ini open-source dan sangat menyambut kontribusi dari siapapun! 🙌
 
-### Cara Berkontribusi
-
-1. **Fork** repository ini
-2. Buat branch fitur: `git checkout -b feature/nama-fitur`
-3. Commit perubahan: `git commit -m 'feat: tambah fitur X'`
-4. Push ke branch: `git push origin feature/nama-fitur`
-5. Buat **Pull Request**
+```
+1. Fork → 2. Buat branch → 3. Commit → 4. Pull Request
+```
 
 ### Area yang Bisa Dikontribusikan
 
-- [ ] Tambah support kamera CCTV baru
-- [ ] Implementasi MQTT subscriber + database writer (SQLite/PostgreSQL)
+- [ ] Komponen **Consumer/Ingestion service** (MQTT → QuestDB)
+- [ ] Tambah dukungan kamera CCTV baru
 - [ ] Ekspor laporan PDF dari dashboard
-- [ ] Notifikasi alert saat volume melewati threshold
-- [ ] Custom ByteTrack config optimizer
+- [ ] Alert otomatis saat volume melewati threshold
 - [ ] Unit test untuk inference pipeline
-- [ ] Dokumentasi lebih lengkap (bahasa Inggris & Indonesia)
-
-### Pelaporan Bug / Saran
-
-Silakan buka [GitHub Issue](https://github.com/username/yitms/issues) dengan label yang sesuai.
+- [ ] Terjemahan dokumentasi (English)
 
 ---
 
 ## 📄 Lisensi
 
-Proyek ini dilisensikan di bawah [MIT License](LICENSE) — bebas digunakan, dimodifikasi, dan didistribusikan.
+[MIT License](LICENSE) — bebas digunakan, dimodifikasi, dan didistribusikan.
 
 ---
 
 ## 🙏 Acknowledgements
 
-- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) — Object detection & tracking
-- [Streamlit](https://streamlit.io) — Dashboard framework
-- [CCTV Jogjakota](https://cctvjss.jogjakota.go.id) — Public CCTV stream
-- [Eclipse Paho](https://github.com/eclipse/paho.mqtt.python) — MQTT client
-- [Plotly](https://plotly.com/python/) — Interactive charts
+- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics)
+- [Streamlit](https://streamlit.io)
+- [CCTV Jogjakota](https://cctvjss.jogjakota.go.id)
+- [Eclipse Paho MQTT](https://github.com/eclipse/paho.mqtt.python)
+- [Plotly](https://plotly.com/python/)
 
 ---
 
