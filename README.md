@@ -101,7 +101,6 @@ yitms/
 │
 ├── inference/                  # Computer Vision inference scripts
 │   ├── cam1-demangan.py        # CCTV Simpang Demangan
-│   ├── cam2-lampumerah-pingit.py
 │   ├── cam3-yos-sudarso.py
 │   ├── cam4-titiknol.py
 │   ├── Dockerfile
@@ -168,7 +167,9 @@ Dashboard terbuka di `http://localhost:8501` — dataset sudah tersedia di `data
 ```bash
 # Letakkan model YOLO dan tracker config di folder models/
 cp /path/to/yolo26n.pt models/
-cp /path/to/custom_bytetrack.yaml models/
+cp /path/to/custom_bytetrack.yaml models/---
+
+---
 ```
 
 > Bisa juga pakai model standar `yolov8n.pt` dari Ultralytics sebagai alternatif.
@@ -228,26 +229,6 @@ python inference/cam1-demangan.py
 | `created_at` | datetime | `2026-03-25 20:14:22` |
 | `location` | string | `demangan`, `yos_sudarso`, `titik_nol` |
 
----
-
-## 🤝 Kontribusi
-
-Project ini open-source dan sangat menyambut kontribusi dari siapapun! 🙌
-
-```
-1. Fork → 2. Buat branch → 3. Commit → 4. Pull Request
-```
-
-### Area yang Bisa Dikontribusikan
-
-- [ ] Komponen **Consumer/Ingestion service** (MQTT → QuestDB)
-- [ ] Tambah dukungan kamera CCTV baru
-- [ ] Ekspor laporan PDF dari dashboard
-- [ ] Alert otomatis saat volume melewati threshold
-- [ ] Unit test untuk inference pipeline
-- [ ] Terjemahan dokumentasi (English)
-
----
 
 ## 📄 Lisensi
 
