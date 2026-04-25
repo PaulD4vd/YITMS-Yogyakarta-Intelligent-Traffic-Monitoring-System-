@@ -10,7 +10,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-orange)
 
-**Sistem monitoring dan analitik lalu lintas real-time berbasis Computer Vision**  
+**Sistem monitoring dan analitik lalu lintas berbasis Computer Vision**  
 menggunakan public CCTV Kota Yogyakarta · YOLO Tracking · MQTT · Streamlit
 
 </div>
